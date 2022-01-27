@@ -1,0 +1,14 @@
+Source: unipi-os-configurator
+Section: unknown
+Priority: optional
+Maintainer: Martin Kudlacek <kudlacek@unipi.technology>
+Build-Depends: debhelper (>= 10)
+Standards-Version: 3.9.8.0
+Homepage: www.unipi.technology
+#Vcs-Git: https://git.unipi.technology/UniPi/unipi-dummy
+#Vcs-Browser: https://git.unipi.technology/UniPi/unipi-dummy
+
+Package: unipi-os-configurator
+Architecture: any
+Description: Binaries and scripts for Unipi OS configurator
+ 

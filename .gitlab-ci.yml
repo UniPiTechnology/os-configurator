@@ -1,0 +1,6 @@
+include:
+    project: docker/template
+    file: debian-pkg-ng.yaml
+variables:
+    build_for_product: "all"
+    build_for_distribution: "stable newstable"
