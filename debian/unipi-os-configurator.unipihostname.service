@@ -1,0 +1,14 @@
+[Unit]
+Description=Set default hostname on Unipi controllers
+After=local-fs.target
+Before=avahi-daemon.service
+
+[Service]
+Type=oneshot
+ExecStart=-/opt/unipi/tools/unipihostname unipi raspberrypi raspberry
+ExecStartPost=/bin/sh -c 'grep "`hostname`" /etc/hosts || echo "127.0.1.1  `hostname`" >> /etc/hosts || /bin/true'
+ExecStartPost=/bin/sh -c 'systemctl --no-block try-restart avahi-daemon || /bin/true'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target

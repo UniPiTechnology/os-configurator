@@ -3,19 +3,26 @@
 # output every command that modifies files on the build system.
 DH_VERBOSE = 1
 
-ifeq ($(shell dpkg-architecture -q DEB_BUILD_ARCH),armhf)
+#ifeq ($(shell dpkg-architecture -q DEB_BUILD_ARCH),armhf)
 
-RPI_FIRMWARE_VER = $(shell dpkg-query -f='$${Version}' -W raspberrypi-kernel-headers)
-LINUX_DIR_PATH = $(shell dpkg -L raspberrypi-kernel-headers | sed -n '/^\/lib\/modules\/.*-v7.*\/build$$/p'|head -1)
-KERNEL_VERSION = $(subst /lib/modules/,,$(subst /build,,$(LINUX_DIR_PATH)))
+#RPI_FIRMWARE_VER = $(shell dpkg-query -f='$${Version}' -W raspberrypi-kernel-headers)
+#LINUX_DIR_PATH = $(shell dpkg -L raspberrypi-kernel-headers | sed -n '/^\/lib\/modules\/.*-v7.*\/build$$/p'|head -1)
+#KERNEL_VERSION = $(subst /lib/modules/,,$(subst /build,,$(LINUX_DIR_PATH)))
 
-endif
+#endif
 
 PROJECT_VERSION=$(shell dpkg-parsechangelog -S Version)
 
 %:
-	dh $@ --with=systemd
+	dh $@
+#--with=systemd # not used anymore in compat=11
 
-override_dh_auto_build:
-	dh_auto_build -- LINUX_DIR_PATH="$(LINUX_DIR_PATH)" PROJECT_VERSION=$(PROJECT_VERSION)
+#override_dh_auto_build:
+#	dh_auto_build -- LINUX_DIR_PATH="$(LINUX_DIR_PATH)" PROJECT_VERSION=$(PROJECT_VERSION)
 
+#override_dh_strip:
+#	dh_strip --no-automatic-dbgsym
+
+override_dh_installsystemd:
+	dh_installsystemd --name=unipicheck
+	dh_installsystemd --name=unipihostname
