@@ -103,7 +103,7 @@ int callback(int slot, int module_id, void* cbdata)
 	char* overlays = (char*) cbdata;
 	const char* name = unipi_slot_dt(module_id, slot);
 	if (name) {
-		strncat(strncat(overlays, name, MAX_DATA), " ", MAX_DATA);
+		strncat(strncat(overlays, name, MAX_DATA-1), " ", MAX_DATA-1);
 	}
 	//printf("slot=%d id=%d\n", slot, module_id);
 	return 0;
@@ -135,7 +135,7 @@ int main(int argc, char** argv)
 	if (get_product_id(&product_id) == 0) {
 		name = unipi_product_dt(product_id);
 		if (name)
-			strncat(strncat(overlays, name, MAX_DATA), " ", MAX_DATA);
+			strncat(strncat(overlays, name, MAX_DATA-1), " ", MAX_DATA-1);
 		name = unipi_family_name(product_id);
 		if (name)
 			printf("Family: %s\n", name);
@@ -149,7 +149,7 @@ int main(int argc, char** argv)
 		if (sscanf(unipi_item, "%hx", &board_id) == 1) {
 			name = unipi_board_dt(board_id);
 			if (name) {
-				strncat(strncat(overlays, name, MAX_DATA), " ", MAX_DATA);
+				strncat(strncat(overlays, name, MAX_DATA-1), " ", MAX_DATA-1);
 			}
 			name = unipi_board_name(board_id);
 			if (name)
