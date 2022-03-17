@@ -6,8 +6,96 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <dirent.h>
 
 
+char UNIPI_ID_SYSFS[] = "/sys/devices/platform/unipi-id/unipi-id";
+#define MAX_DATA 2048
+
+char* get_unipi_id_item(const char* item, int trunc)
+{
+   int res;
+   char *data, *lf;
+   char fname[2048];
+
+   snprintf(fname, 2047, "%s/%s", UNIPI_ID_SYSFS, item);
+   fname[2047] = '\0';
+   //printf("%s\n", fname);
+
+   int f = open(fname, O_RDONLY);
+   if (f < 0)
+      return NULL;
+
+   data = malloc(MAX_DATA);
+   if (data == NULL) goto err;
+   res = read(f, data, MAX_DATA-1);
+   if (res <= 0) goto err1;
+   data[res] = '\0';
+   if (trunc) {
+      lf = strchr(data,'\n');
+      if (lf) *lf = '\0';
+   }
+   close(f);
+   return data;
+
+err1:
+   free(data);
+err:
+   close(f);
+   return NULL;
+}
+
+int for_each_module_id(int (*callback)(int, int, void*), void* cbdata)
+{
+    int slot, module_id;
+    DIR *d;
+    struct dirent *dir;
+    char prefix[] = "module_id.";
+    char* value;
+
+    d = opendir(UNIPI_ID_SYSFS);
+    if (d) {
+        while ((dir = readdir(d)) != NULL) {
+            if ((dir->d_type == DT_REG)&&( strstr(dir->d_name, prefix) == dir->d_name)) {
+                if (sscanf(dir->d_name+strlen(prefix), "%d", &slot) == 1) {
+                    value = get_unipi_id_item(dir->d_name, 1);
+                    if (value && (sscanf(value, "%x", &module_id)==1)) {
+                        free(value);
+                        if (callback(slot, module_id, cbdata) != 0) break;
+                        //printf("%s %d %d\n", dir->d_name, slot, module_id);
+                    } else if (value) free(value);
+                }
+            }
+        }
+        closedir(d);
+    }
+    return(0);
+}
+
+int for_each_module_description(int (*callback)(int, const char *, void*), void* cbdata)
+{
+    int slot;
+    DIR *d;
+    struct dirent *dir;
+    char prefix[] = "module_description.";
+
+    d = opendir(UNIPI_ID_SYSFS);
+    if (d) {
+        while ((dir = readdir(d)) != NULL) {
+            if ((dir->d_type == DT_REG)&&( strstr(dir->d_name, prefix) == dir->d_name)) {
+                if (sscanf(dir->d_name+strlen(prefix), "%d", &slot) == 1) {
+                    if (callback(slot, dir->d_name, cbdata) != 0) break;
+                    //printf("%s %d\n", dir->d_name, slot);
+                }
+            }
+        }
+        closedir(d);
+    }
+    return(0);
+}
+
+/*
 typedef struct __attribute__ ((packed)) {
     uint16_t   signature;
     uint8_t   ver1[2];
@@ -83,7 +171,9 @@ err:
    close(f);
    return 1;
 }
+*/
 
+/*
 char* get_unipi_name(void)
 {
 	if (! unipi_loaded) {
@@ -103,18 +193,4 @@ char* get_unipi_name(void)
 	}
 	return unipi_name;
 }
-
-uint32_t get_unipi_serial(void)
-{
-	if (! unipi_loaded) {
-		if (read_unipi1_eprom(&global_unipi_version) == 0) {
-			return global_unipi_version.serial;
-
-		} else if (read_unipi_eprom(&global_unipi_version) == 0)
-			return global_unipi_version.serial;
-
-		global_unipi_version.serial = 0;
-	}
-	return global_unipi_version.serial;
-}
-
+*/
