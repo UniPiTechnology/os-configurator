@@ -27,12 +27,10 @@ override PROJECT_VERSION := -DPROJECT_VERSION=$(PROJECT_VERSION)
 endif
 
 
-DSTDIR = .
-
 # List all user libraries here
 LIBS = m
 
-BINFILES = unipiid unipicheck os-configurator
+BINFILES = unipiid unipihostname unipicheck os-configurator
 
 # Define optimisation level here
 #OPT = -Ofast # Very aggressive
@@ -50,8 +48,7 @@ INCDIR  = $(patsubst %,-I%, $(INCDIRS))
 LIBDIR  = $(patsubst %,-L%, $(LIBDIRS))
 LIB     = $(patsubst %,-l%, $(LIBS))
 
-OBJS  = $(SRC:.c=.o)
-SPIOBJS  = $(SPISRC:.c=.o)
+#OBJS  = $(SRC:.c=.o)
 
 LDFLAGS = $(LIBDIR) $(LIB)
 #CPFLAGS = -g -fomit-frame-pointer -Wall -Wstrict-prototypes -fverbose-asm 
@@ -68,6 +65,9 @@ all: $(BINFILES)
 unipiid:  unipiid.o unipiutil.o
 	$(CC) unipiid.o unipiutil.o -o $@
 	@chmod +x $@
+
+unipihostname: unipiid
+	@ln $< $@
 
 unipicheck:  unipicheck.o unipiutil.o
 	$(CC) unipicheck.o unipiutil.o -o $@

@@ -1,13 +1,14 @@
-INSTALL = install
+#INSTALL = install
 
-BINFILES = unipihostname unipicheck
-
-all:
-	cd src; make
-
-install:
-	$(INSTALL) -D $(BINFILES:%=src/%) -t $(DESTDIR)/opt/unipi/tools
+#BINFILES = unipihostname unipicheck
 
 
-clean:
-	cd src && make clean
+%:
+	MAKEFLAGS="$(MAKEFLAGS)" $(MAKE) -C src $@
+
+#install:
+#	$(INSTALL) -D $(BINFILES:%=src/%) -t $(DESTDIR)/opt/unipi/tools
+
+
+#clean:
+#	cd src && make clean
