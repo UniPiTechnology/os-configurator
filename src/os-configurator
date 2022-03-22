@@ -2,11 +2,11 @@
 
 OLD_FINGERPRINT=/opt/unipi/os-configurator/fingerprint
 
-if [ "$1" == "--check" ]; then
-    [ "$(/opt/unipi/tools/unipiid fingerprint)" = "$(cat ${OLD_FINGERPRINT}" ] && exit 0
+if [ "$1" = "--check" ]; then
+    [ "$(/opt/unipi/tools/unipiid fingerprint)" = "$(cat ${OLD_FINGERPRINT})" ] && exit 0
     shift
 fi
-if [ "$1" == "--force" ]; then
+if [ "$1" = "--force" ]; then
     if python3 /opt/unipi/os-configurator/os-configurator.py $*; then
         /opt/unipi/tools/unipiid fingerprint > "${OLD_FINGERPRINT}"
         echo "Reboot system to apply all changes in configuration"
