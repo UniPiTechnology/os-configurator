@@ -30,7 +30,8 @@ endif
 # List all user libraries here
 LIBS = m
 
-BINFILES = unipiid unipihostname uhelper os-configurator.py
+BINFILES = unipiid unipihostname uhelper
+PYFILES = os-configurator.py
 
 # Define optimisation level here
 #OPT = -Ofast # Very aggressive
@@ -57,7 +58,7 @@ CPFLAGS = -Wall -Wstrict-prototypes $(OPT) $(DBG)
 #
 # makefile rules
 #
-all: $(BINFILES)
+all: $(BINFILES) $(PYFILES)
 
 %.o: %.c
 	$(CC) -c $(CPFLAGS) $(LDFLAGS) -I . $(INCDIR) $(PROJECT_VERSION) $< -o $@
@@ -80,10 +81,9 @@ os-configurator: os-configurator.o unipiutil.o
 	$(CC) $^ -ldl -o $@
 	@chmod +x $@
 
-os-configurator.py:
 
 install:
-	$(INSTALL) -D $(BINFILES) -t $(DESTDIR)/opt/unipi/tools
+	$(INSTALL) -D $(BINFILES) $(PYFILES) -t $(DESTDIR)/opt/unipi/tools
 
 clean:
 	-rm -f *.o
