@@ -32,6 +32,7 @@ LIBS = m
 
 BINFILES = unipiid unipihostname uhelper
 PYFILES = os-configurator.py
+SHFILES = os-configurator
 
 # Define optimisation level here
 #OPT = -Ofast # Very aggressive
@@ -73,17 +74,17 @@ uhelper:  uhelper.o
 unipihostname: unipiid
 	@ln $< $@
 
-unipicheck:  unipicheck.o unipiutil.o
-	$(CC) unipicheck.o unipiutil.o -o $@
-	@chmod +x $@
+#unipicheck:  unipicheck.o unipiutil.o
+#	$(CC) unipicheck.o unipiutil.o -o $@
+#	@chmod +x $@
 
-os-configurator: os-configurator.o unipiutil.o
-	$(CC) $^ -ldl -o $@
-	@chmod +x $@
-
+#os-configurator: os-configurator.o unipiutil.o
+#	$(CC) $^ -ldl -o $@
+#	@chmod +x $@
 
 install:
-	$(INSTALL) -D $(BINFILES) $(PYFILES) -t $(DESTDIR)/opt/unipi/tools
+	$(INSTALL) -D $(BINFILES) $(SHFILES) -t $(DESTDIR)/opt/unipi/tools
+	$(INSTALL) -D $(PYFILES) -t $(DESTDIR)/opt/unipi/os-configurator
 
 clean:
 	-rm -f *.o
