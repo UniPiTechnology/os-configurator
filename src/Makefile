@@ -80,6 +80,8 @@ os-configurator: os-configurator.o unipiutil.o
 	$(CC) $^ -ldl -o $@
 	@chmod +x $@
 
+os-configurator.py:
+
 install:
 	$(INSTALL) -D $(BINFILES) -t $(DESTDIR)/opt/unipi/tools
 
