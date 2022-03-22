@@ -72,7 +72,7 @@ uhelper:  uhelper.o
 	$(CC) $< -o $@
 
 unipihostname: unipiid
-	@ln $< $@
+	@ln -s $< $@
 
 #unipicheck:  unipicheck.o unipiutil.o
 #	$(CC) unipicheck.o unipiutil.o -o $@
