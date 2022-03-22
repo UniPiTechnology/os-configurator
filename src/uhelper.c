@@ -87,6 +87,20 @@ int unlink_f(const char* dir, const char *linkpath)
 	return 0;
 }
 
+int unipi_id(char* u_func)
+{
+	char tmp[PATH_MAX];
+	char *dev;
+
+	mkdir_p(RUNDIR);
+	dev = getenv("DEVPATH");
+	if (dev) {
+		snprintf(tmp, PATH_MAX-1, "/sys%s/unipi-id", dev);
+		ln_sf(tmp, RUNDIR, u_func);
+	}
+	return 0;
+}
+
 char u_sys_dir[PATH_MAX];
 char u_slot_dir[PATH_MAX];
 char tmp[PATH_MAX];
@@ -99,8 +113,11 @@ int main(int argc, char **argv)
 	char *action = getenv("ACTION");
 	char *subsystem = getenv("SUBSYSTEM");
 	
-	if (action == NULL) {
+	if ((action == NULL) || (argc < 3) ) {
 		return 1;
+	}
+	if (strcmp(argv[1], "unipi-id")==0) {
+		return unipi_id(argv[2]);
 	}
 	if (argc < 4) {
 		return 1;
