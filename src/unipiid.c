@@ -19,7 +19,7 @@ int do_hostname(int argc, char** argv)
    char hostname[256];
    char *unipi_model, *unipi_serial;
 
-	printf("--- %d\n", argc);
+   //printf("--- %d\n", argc);
    if (argc > 1) {
       if (gethostname(hostname, sizeof(hostname))) return 1;
       //printf("%s\n", hostname);

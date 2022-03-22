@@ -30,7 +30,7 @@ endif
 # List all user libraries here
 LIBS = m
 
-BINFILES = unipiid unipihostname unipicheck os-configurator
+BINFILES = unipiid unipihostname uhelper os-configurator.py
 
 # Define optimisation level here
 #OPT = -Ofast # Very aggressive
@@ -65,6 +65,9 @@ all: $(BINFILES)
 unipiid:  unipiid.o unipiutil.o
 	$(CC) unipiid.o unipiutil.o -o $@
 	@chmod +x $@
+
+uhelper:  uhelper.o
+	$(CC) $< -o $@
 
 unipihostname: unipiid
 	@ln $< $@
