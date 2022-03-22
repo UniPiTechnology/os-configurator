@@ -113,12 +113,17 @@ def main_overlays():
 
 
 if __name__ == "__main__":
+	import argparse
+	a = argparse.ArgumentParser(prog='os-configurator.py')
+	a.add_argument('-f','--force', help='run action to modify os', action='store_const', const=True, default=False )
+	#a.add_argument('description', metavar="file", help='input yaml description', type=str, nargs=1)
+	args = a.parse_args()
 	try:
 		env = main_overlays()
-		if sys.argc > 1 and sys.argv[1] == "--force":
+		if args.force:
 			os.environ.update(**{k.upper(): " ".join(v) for k,v in env.items()})
 			os.execlpe("run-parts", "run-parts", "--verbose",
-				"--regex=.sh$", "--exit-on-error"
+				"--regex=.sh$", "--exit-on-error",
 				"/opt/unipi/os-configurator/run.d",
 				os.environ)
 		else:
