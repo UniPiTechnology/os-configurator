@@ -115,15 +115,16 @@ def main_overlays():
 if __name__ == "__main__":
 	try:
 		env = main_overlays()
-		if False:
-			for k,v in env.items():
-				print("%s='%s'" % (k.upper(), " ".join(v)))
-		else:
+		if sys.argc > 1 and sys.argv[1] == "--force":
 			os.environ.update(**{k.upper(): " ".join(v) for k,v in env.items()})
 			os.execlpe("run-parts", "run-parts", "--verbose",
-				"--regex=.sh$",
+				"--regex=.sh$", "--exit-on-error"
 				"/opt/unipi/os-configurator/run.d",
 				os.environ)
+		else:
+			for k,v in env.items():
+				print("%s='%s'" % (k.upper(), " ".join(v)))
+
 		sys.exit(0)
 
 	except FileNotFoundError as E:

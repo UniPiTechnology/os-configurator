@@ -4,7 +4,7 @@ After=local-fs.target
 
 [Service]
 Type=oneshot
-ExecStart=sh -c 'test "$(/opt/unipi/tools/unipiid fingerprint)" = "$(cat /opt/unipi/os-configurator/fingerprint)" || /opt/unipi/tools/os-configurator && /opt/unipi/tools/unipiid fingerprint >/opt/unipi/os-configurator/fingerprint'
+ExecStart=/opt/unipi/tools/os-configurator --check --force
 RemainAfterExit=yes
 
 [Install]
