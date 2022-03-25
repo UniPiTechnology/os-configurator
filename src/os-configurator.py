@@ -115,12 +115,14 @@ def main_overlays():
 if __name__ == "__main__":
 	import argparse
 	a = argparse.ArgumentParser(prog='os-configurator.py')
-	a.add_argument('-f','--force', help='run action to modify os', action='store_const', const=True, default=False )
+	a.add_argument('-f','--update', help='run action to modify os', action='store_const', const=True, default=False )
+	a.add_argument('-f','--force', help='run action to modify os by ignoring errors', action='store_const', const=True, default=False )
 	#a.add_argument('description', metavar="file", help='input yaml description', type=str, nargs=1)
 	args = a.parse_args()
+	env = None
 	try:
 		env = main_overlays()
-		if args.force:
+		if args.update:
 			os.environ.update(**{k.upper(): " ".join(v) for k,v in env.items()})
 			os.execlpe("run-parts", "run-parts", "--verbose",
 				"--regex=.sh$", "--exit-on-error",
@@ -130,11 +132,19 @@ if __name__ == "__main__":
 			for k,v in env.items():
 				print("%s='%s'" % (k.upper(), " ".join(v)))
 
-		sys.exit(0)
+		if not args.force:
+			sys.exit(0)
 
 	except FileNotFoundError as E:
 		print("Missing unipi-id module or bad id eprom.\n", str(E))
 	except ValueError as E:
 		print("Bad ID value in unipi-id eprom.\n", str(E))
+
+	if args.force:
+		if env: os.environ.update(**{k.upper(): " ".join(v) for k,v in env.items()})
+		os.execlpe("run-parts", "run-parts", "--verbose",
+			"--regex=.sh$",
+			"/opt/unipi/os-configurator/run.d",
+			os.environ)
 
 	sys.exit(1)
