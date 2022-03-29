@@ -139,7 +139,7 @@ int main(int argc, char **argv)
 				write_interface(u_sys_dir, interface);
 			}
 		} else if (subsystem && 
-				((strcmp(subsystem, "tty")==0)||(strcmp(subsystem, "gpio")==0))) {
+				((strcmp(subsystem, "tty")==0)||(strcmp(subsystem, "gpio")==0)||(strcmp(subsystem, "spidev")==0))) {
 			dev = getenv("DEVNAME");
 			if (dev) {
 				ln_sf(dev, u_slot_dir, u_func);
