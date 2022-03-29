@@ -115,7 +115,7 @@ def main_overlays():
 if __name__ == "__main__":
 	import argparse
 	a = argparse.ArgumentParser(prog='os-configurator.py')
-	a.add_argument('-f','--update', help='run action to modify os', action='store_const', const=True, default=False )
+	a.add_argument('-u','--update', help='run action to modify os', action='store_const', const=True, default=False )
 	a.add_argument('-f','--force', help='run action to modify os by ignoring errors', action='store_const', const=True, default=False )
 	#a.add_argument('description', metavar="file", help='input yaml description', type=str, nargs=1)
 	args = a.parse_args()
