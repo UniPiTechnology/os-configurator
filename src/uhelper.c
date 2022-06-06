@@ -19,6 +19,8 @@
 #define U_SLOT_DIR  RUNDIR "/by-slot/slot%s/%s"
 #define U_SYS_DIR   RUNDIR "/by-sys/%s"
 
+extern char **environ;
+
 int mkdir_p(const char *path)
 {
     /* Adapted from http://stackoverflow.com/a/2336245/119527 */
@@ -87,6 +89,25 @@ int unlink_f(const char* dir, const char *linkpath)
 	return 0;
 }
 
+int create_udev_infofile(char *dir)
+{
+	char tmp[PATH_MAX];
+	int fd;
+	snprintf(tmp, PATH_MAX-1, "%s/%s", dir, "udev_info");
+	fd = open(tmp, O_CREAT|O_RDWR, 0644);
+	if (fd < 0) {
+		return fd;
+	}
+
+	for (char **env_item = environ; *env_item != 0; env_item++) {
+		write(fd, *env_item, strlen(*env_item));
+		write(fd, "\n", 1);
+        }
+
+	close(fd);
+	return 0;
+}
+
 int unipi_id(char* u_func)
 {
 	char tmp[PATH_MAX];
@@ -112,7 +133,7 @@ int main(int argc, char **argv)
 	char *dev, *interface;
 	char *action = getenv("ACTION");
 	char *subsystem = getenv("SUBSYSTEM");
-	
+
 	if ((action == NULL) || (argc < 3) ) {
 		return 1;
 	}
@@ -138,12 +159,17 @@ int main(int argc, char **argv)
 				write_interface(u_slot_dir, interface);
 				write_interface(u_sys_dir, interface);
 			}
-		} else if (subsystem && 
-				((strcmp(subsystem, "tty")==0)||(strcmp(subsystem, "gpio")==0)||(strcmp(subsystem, "spidev")==0))) {
+		} else if (subsystem &&
+				((strcmp(subsystem, "tty")==0)||\
+				(strcmp(subsystem, "gpio")==0)||\
+				(strcmp(subsystem, "block")==0)||\
+				(strcmp(subsystem, "spidev")==0))) {
 			dev = getenv("DEVNAME");
 			if (dev) {
 				ln_sf(dev, u_slot_dir, u_func);
 				ln_sf(dev, u_sys_dir,  u_func);
+				//create_udev_infofile(u_slot_dir); //// TODO - delete file on remove
+				//create_udev_infofile(u_sys_dir); // TODO - delete file on remove
 				return 0;
 			}
 		}
