@@ -94,8 +94,8 @@ int main(int argc, char** argv)
    char *saveptr;
    char *line, *token;
 
-   unipi_model = get_unipi_name();
-   if (unipi_model[0]=='\0') return 0;
+   unipi_model = get_unipi_id_item("product_model", 1);
+   if (unipi_model==NULL) return 0;
 
    /* try to open */
    ftable = fopen("/opt/unipi/data/unipi-target.map", "r");
@@ -128,7 +128,8 @@ int main(int argc, char** argv)
 
    free(line);
    fclose(ftable);
-   while (waitpid(-1, NULL, 0) > 0);
+   free(unipi_model);
 
+   while (waitpid(-1, NULL, 0) > 0);
    return 0;
 }

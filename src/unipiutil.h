@@ -17,8 +17,8 @@
 # define stringify(VER) e_stringify(VER)
 # define PROJECT_VER stringify(PROJECT_VERSION)
 
-char* get_unipi_name(void);
-uint32_t get_unipi_serial(void);
-
+char* get_unipi_id_item(const char* item, int trunc);
+int for_each_module_id(int (*callback)(int, int, void*), void* cbdata);
+int for_each_module_description(int (*callback)(int, const char*, void*), void* cbdata);
 
 #endif

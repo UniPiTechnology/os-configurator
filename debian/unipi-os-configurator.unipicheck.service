@@ -1,10 +1,10 @@
 [Unit]
-Description=Check Unipi/Neuron/Axon version
+Description=Check Unipi Id fingerprint and call os-configurator
 After=local-fs.target
 
 [Service]
 Type=oneshot
-ExecStart=/opt/unipi/tools/unipicheck
+ExecStart=/opt/unipi/tools/os-configurator --check --update
 RemainAfterExit=yes
 
 [Install]

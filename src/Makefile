@@ -27,12 +27,12 @@ override PROJECT_VERSION := -DPROJECT_VERSION=$(PROJECT_VERSION)
 endif
 
 
-DSTDIR = .
-
 # List all user libraries here
 LIBS = m
 
-BINFILES = unipihostname unipicheck
+BINFILES = unipiid unipihostname uhelper
+PYFILES = os-configurator.py
+SHFILES = os-configurator
 
 # Define optimisation level here
 #OPT = -Ofast # Very aggressive
@@ -44,13 +44,13 @@ DBG = -g0 # No debug
 #DBG = -g # Medium debug
 #DBG = -g2 # All debug symbols 
 
+INCDIRS += ../unipi-hardware-id/include
 
 INCDIR  = $(patsubst %,-I%, $(INCDIRS))
 LIBDIR  = $(patsubst %,-L%, $(LIBDIRS))
 LIB     = $(patsubst %,-l%, $(LIBS))
 
-OBJS  = $(SRC:.c=.o)
-SPIOBJS  = $(SPISRC:.c=.o)
+#OBJS  = $(SRC:.c=.o)
 
 LDFLAGS = $(LIBDIR) $(LIB)
 #CPFLAGS = -g -fomit-frame-pointer -Wall -Wstrict-prototypes -fverbose-asm 
@@ -59,21 +59,32 @@ CPFLAGS = -Wall -Wstrict-prototypes $(OPT) $(DBG)
 #
 # makefile rules
 #
-all: $(BINFILES)
+all: $(BINFILES) $(PYFILES)
 
 %.o: %.c
 	$(CC) -c $(CPFLAGS) $(LDFLAGS) -I . $(INCDIR) $(PROJECT_VERSION) $< -o $@
 
-unipihostname:  unipihostname.o unipiutil.o
-	$(CC) unipihostname.o unipiutil.o -o $@
+unipiid:  unipiid.o unipiutil.o
+	$(CC) unipiid.o unipiutil.o -o $@
 	@chmod +x $@
 
-unipicheck:  unipicheck.o unipiutil.o
-	$(CC) unipicheck.o unipiutil.o -o $@
-	@chmod +x $@
+uhelper:  uhelper.o
+	$(CC) $< -o $@
+
+unipihostname: unipiid
+	@ln -s $< $@
+
+#unipicheck:  unipicheck.o unipiutil.o
+#	$(CC) unipicheck.o unipiutil.o -o $@
+#	@chmod +x $@
+
+#os-configurator: os-configurator.o unipiutil.o
+#	$(CC) $^ -ldl -o $@
+#	@chmod +x $@
 
 install:
-	$(INSTALL) -D $(BINFILES) -t $(DESTDIR)/opt/unipi/tools
+	$(INSTALL) -D $(BINFILES) $(SHFILES) -t $(DESTDIR)/opt/unipi/tools
+	$(INSTALL) -D $(PYFILES) -t $(DESTDIR)/opt/unipi/os-configurator
 
 clean:
 	-rm -f *.o
