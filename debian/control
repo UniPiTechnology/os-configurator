@@ -10,5 +10,6 @@ Homepage: www.unipi.technology
 
 Package: unipi-os-configurator
 Architecture: any
+Breaks: unipi-os-configurator-data (<= 0.12)
 Description: Binaries and scripts for Unipi OS configurator
  
