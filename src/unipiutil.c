@@ -11,7 +11,20 @@
 
 
 char UNIPI_ID_SYSFS[] = "/sys/devices/platform/unipi-id/unipi-id";
+char UNIPI_ID_DRIVER[] = "/sys/devices/platform/unipi-id/driver";
 #define MAX_DATA 2048
+
+int wait_for_module(int timeout)
+{
+
+   while (access(UNIPI_ID_DRIVER, R_OK) != 0) {
+       timeout -= 20;
+       if (timeout < 0) return 1;
+       usleep(20000);
+   }
+   return 0;
+}
+
 
 char* get_unipi_id_item(const char* item, int trunc)
 {
