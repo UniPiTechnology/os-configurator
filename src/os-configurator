@@ -3,6 +3,9 @@
 OLD_FINGERPRINT=/opt/unipi/os-configurator/fingerprint
 
 if [ "$1" = "--check" ]; then
+    FG="$(/opt/unipi/tools/unipiid fingerprint)"
+    OFG="$(cat ${OLD_FINGERPRINT})"
+    #logger FG=$FG OFG=$OFG
     [ "$(/opt/unipi/tools/unipiid fingerprint)" = "$(cat ${OLD_FINGERPRINT})" ] && exit 0
     shift
 fi
@@ -10,7 +13,11 @@ if [ "$1" = "--update" ]; then
     if python3 /opt/unipi/os-configurator/os-configurator.py $*; then
         /opt/unipi/tools/unipiid fingerprint > "${OLD_FINGERPRINT}"
         echo "Reboot system to apply all changes in configuration"
-        systemctl start systemd-reboot
+        sync
+        mount / -o remount,ro
+        #sleep 2;
+        sync
+        systemctl reboot #start systemd-reboot
     fi
     exit $?
 fi
