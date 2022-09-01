@@ -3,10 +3,10 @@
 OLD_FINGERPRINT=/opt/unipi/os-configurator/fingerprint
 
 if [ "$1" = "--check" ]; then
+    echo "OS Configurator: check started" > /dev/kmsg
     FG="$(/opt/unipi/tools/unipiid fingerprint)"
     OFG="$(cat ${OLD_FINGERPRINT})"
     #logger FG=$FG OFG=$OFG
-    echo "OS Configurator: check started" > /dev/kmsg
     
     if [ "$(/opt/unipi/tools/unipiid fingerprint)" = "$(cat ${OLD_FINGERPRINT})" ]; then
 
@@ -17,8 +17,6 @@ if [ "$1" = "--check" ]; then
     echo "OS Configurator: Changes found, calling update..." > /dev/kmsg
     shift
 
-    [ "$(/opt/unipi/tools/unipiid fingerprint)" = "$(cat ${OLD_FINGERPRINT})" ] && exit 0
-    shift
 fi
 if [ "$1" = "--update" ]; then
     echo "OS Configurator: Update invoked" > /dev/kmsg
