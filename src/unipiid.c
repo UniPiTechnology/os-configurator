@@ -56,9 +56,13 @@ int do_hostname(int argc, char** argv)
    return 0;
 }
 
+#define TIMEOUT 5000
+
 int main(int argc, char** argv)
 {
 	char * unipi_item;
+
+	wait_for_module(TIMEOUT);
 	if (strcmp(basename(argv[0]), "unipihostname") == 0) {
 		return do_hostname(argc, argv);
 	}

@@ -1,10 +1,13 @@
 [Unit]
 Description=Check Unipi Id fingerprint and call os-configurator
 After=local-fs.target
+Before=sysinit.target
+DefaultDependencies=No
 
 [Service]
 Type=oneshot
-ExecStart=/opt/unipi/tools/os-configurator --check --update
+ExecStartPre=/opt/unipi/tools/os-configurator --check --update
+ExecStart=/bin/true
 RemainAfterExit=yes
 
 [Install]
