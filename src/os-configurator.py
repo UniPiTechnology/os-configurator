@@ -136,7 +136,7 @@ if __name__ == "__main__":
 			sys.exit(0)
 
 	except FileNotFoundError as E:
-		print("Missing unipi-id module or bad id eprom.\n", str(E))
+		print("Missing unipi-id module or bad id eprom.\n")
 	except ValueError as E:
 		print("Bad ID value in unipi-id eprom.\n", str(E))
 
