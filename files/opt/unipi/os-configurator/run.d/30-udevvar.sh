@@ -12,7 +12,7 @@ if [ -n "$UDEV" ]; then
 (
 cd "${SRC}"
 # append to words in udev list suffix .rules
-udev_rules_1=$(echo "${UDEV}" | sed 's/\>/.rules/g')
+udev_rules_1=$(echo "${UDEV}" | sed 's/$/.rules/g')
 awk '
 /^#:::/ {
 		gsub("^#:::\\s*", "")
