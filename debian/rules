@@ -26,3 +26,6 @@ PROJECT_VERSION=$(shell dpkg-parsechangelog -S Version)
 override_dh_installsystemd:
 	dh_installsystemd --name=unipicheck
 	dh_installsystemd --name=unipihostname
+
+override_dh_systemd_start:
+    dh_systemd_start --no-start
