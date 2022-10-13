@@ -24,5 +24,8 @@ PROJECT_VERSION=$(shell dpkg-parsechangelog -S Version)
 #	dh_strip --no-automatic-dbgsym
 
 override_dh_installsystemd:
-	dh_installsystemd --name=unipicheck --no-start
-	dh_installsystemd --name=unipihostname --no-start
+	dh_installsystemd --name=unipicheck
+	dh_installsystemd --name=unipihostname
+
+override_dh_systemd_start:
+	dh_systemd_start --no-start --no-restart-after-upgrade

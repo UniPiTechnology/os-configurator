@@ -3,13 +3,23 @@
 OLD_FINGERPRINT=/opt/unipi/os-configurator/fingerprint
 
 if [ "$1" = "--check" ]; then
+    echo "OS Configurator: check started" > /dev/kmsg
     FG="$(/opt/unipi/tools/unipiid fingerprint)"
     OFG="$(cat ${OLD_FINGERPRINT})"
     #logger FG=$FG OFG=$OFG
-    [ "$(/opt/unipi/tools/unipiid fingerprint)" = "$(cat ${OLD_FINGERPRINT})" ] && exit 0
+    
+    if [ "$(/opt/unipi/tools/unipiid fingerprint)" = "$(cat ${OLD_FINGERPRINT})" ]; then
+
+        echo "OS Configurator: Check complete, no changes" > /dev/kmsg
+        exit 0
+    fi
+
+    echo "OS Configurator: Changes found, calling update..." > /dev/kmsg
     shift
+
 fi
 if [ "$1" = "--update" ]; then
+    echo "OS Configurator: Update invoked" > /dev/kmsg
     if python3 /opt/unipi/os-configurator/os-configurator.py $*; then
         /opt/unipi/tools/unipiid fingerprint > "${OLD_FINGERPRINT}"
         echo "Reboot system to apply all changes in configuration"
