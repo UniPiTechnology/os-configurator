@@ -363,6 +363,9 @@ int main (int argc, char **argv)
 	}
 	tty = argv[optind++];
 
+	if (!isatty(fileno(stdout)))
+		setbuf(stdout, NULL);
+
 	return do_capture(device, 15, tty);
 /*
 	if ((argc - optind) > 1) {
