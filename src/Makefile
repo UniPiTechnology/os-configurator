@@ -64,8 +64,8 @@ all: $(BINFILES) $(PYFILES)
 %.o: %.c
 	$(CC) -c $(CPFLAGS) $(LDFLAGS) -I . $(INCDIR) $(PROJECT_VERSION) $< -o $@
 
-sw_485: sw_485.c
-	$(CC) -c $(CPFLAGS) $(LDFLAGS) -I . $(INCDIR) $(PROJECT_VERSION) $< -o $@
+sw_485: sw_485.o
+	$(CC) $< -o $@
 
 unipiid:  unipiid.o unipiutil.o
 	$(CC) unipiid.o unipiutil.o -o $@
