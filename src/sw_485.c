@@ -125,10 +125,9 @@ static int usage(void)
 	printf("   %s /dev/input/eventX /dev/ttymxc0\n", progname);
 	printf("\n");
 	printf(" Query mode: (check exit code)\n");
-	printf("   %s --query /dev/input/eventX <value>\n", progname);
+	printf("   %s --query /dev/input/eventX /dev/ttymxc0\n", progname);
 
 	printf("\n");
-	printf("<value> numerical value 0-15 to monitor\n");
 
 	return EXIT_FAILURE;
 }
