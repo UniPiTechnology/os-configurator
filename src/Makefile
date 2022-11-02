@@ -30,7 +30,7 @@ endif
 # List all user libraries here
 LIBS = m
 
-BINFILES = unipiid unipihostname uhelper
+BINFILES = unipiid unipihostname uhelper sw_485
 PYFILES = os-configurator.py
 SHFILES = os-configurator
 
@@ -64,6 +64,9 @@ all: $(BINFILES) $(PYFILES)
 %.o: %.c
 	$(CC) -c $(CPFLAGS) $(LDFLAGS) -I . $(INCDIR) $(PROJECT_VERSION) $< -o $@
 
+sw_485: sw_485.o
+	$(CC) $< -o $@
+
 unipiid:  unipiid.o unipiutil.o
 	$(CC) unipiid.o unipiutil.o -o $@
 	@chmod +x $@
@@ -73,6 +76,7 @@ uhelper:  uhelper.o
 
 unipihostname: unipiid
 	@ln -s $< $@
+
 
 #unipicheck:  unipicheck.o unipiutil.o
 #	$(CC) unipicheck.o unipiutil.o -o $@
