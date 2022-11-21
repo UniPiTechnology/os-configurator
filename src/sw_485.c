@@ -96,6 +96,7 @@ enum evtest_mode {
 	MODE_CAPTURE,
 	MODE_QUERY,
 	MODE_VERSION,
+	MODE_ONCE,
 };
 
 static char* progname = "sw_485";
@@ -122,7 +123,7 @@ static int usage(void)
 {
 	printf("USAGE:\n");
 	printf(" Capture mode:\n");
-	printf("   %s /dev/input/eventX /dev/ttymxc0\n", progname);
+	printf("   [--once] %s /dev/input/eventX /dev/ttymxc0\n", progname);
 	printf("\n");
 	printf(" Query mode: (check exit code)\n");
 	printf("   %s --query /dev/input/eventX /dev/ttymxc0\n", progname);
@@ -249,7 +250,7 @@ static int wait_events(int fd, unsigned int code, const char* tty)
  * @param device The device to monitor, or NULL if the user should be prompted.
  * @return 0 on success, non-zero on error.
  */
-static int do_capture(const char *device, unsigned int code, const char* tty)
+static int do_capture(const char *device, unsigned int code, const char* tty, int once)
 {
 	int fd, rc;
 
@@ -266,7 +267,8 @@ static int do_capture(const char *device, unsigned int code, const char* tty)
 	if (rc < 0)
 		return EXIT_FAILURE;
 	set_tty_status(tty, rc);
-
+	if (once)
+		return 0;
 	return wait_events(fd, code, tty);
 }
 
@@ -311,6 +313,7 @@ static int query_device(const char *device, int keycode, const char* tty)
 }
 
 static const struct option long_options[] = {
+	{ "once", no_argument, NULL, MODE_ONCE },
 	{ "query", no_argument, NULL, MODE_QUERY },
 	{ "version", no_argument, NULL, MODE_VERSION },
 	{ 0, },
@@ -334,6 +337,7 @@ int main (int argc, char **argv)
 		case 0:
 			break;
 		case MODE_QUERY:
+		case MODE_ONCE:
 			mode = c;
 			break;
 		case MODE_VERSION:
@@ -365,7 +369,7 @@ int main (int argc, char **argv)
 	if (!isatty(fileno(stdout)))
 		setbuf(stdout, NULL);
 
-	return do_capture(device, 15, tty);
+	return do_capture(device, 15, tty, mode == MODE_ONCE);
 /*
 	if ((argc - optind) > 1) {
 		event_type = argv[optind++];
