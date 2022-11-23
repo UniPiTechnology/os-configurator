@@ -17,7 +17,7 @@ int do_hostname(int argc, char** argv)
    int do_set = 0;
    int i;
    char hostname[256];
-   char *unipi_model, *unipi_serial;
+   char *unipi_model, *unipi_serial, *unipi_platform;
 
    //printf("--- %d\n", argc);
    if (argc > 1) {
@@ -44,13 +44,33 @@ int do_hostname(int argc, char** argv)
       return 0;
    }
 
-   snprintf(hostname, 255, "%s-sn%s", unipi_model, unipi_serial);
+   unipi_platform = get_unipi_id_item("platform_id", 1);
+   if (unipi_platform==NULL) {
+      free(unipi_serial);
+      free(unipi_model);
+      return 0;
+   }
+
+   if (strncmp(unipi_platform, "0110", 4) == 0) {
+       /* special format for AC Heating */
+       long serial = strtol(unipi_serial, NULL, 10);
+       char c = 'A';
+       if ((serial / 10000) > ('Z' - 'A')) {
+           serial = 9999; c = 'Z';
+       } else {
+           c += (serial / 10000);
+       }
+       snprintf(hostname, 255, "Z%c-%04d", c, (int)(serial % 10000));
+   } else {
+       snprintf(hostname, 255, "%s-sn%s", unipi_model, unipi_serial);
+   }
    hostname[255] = '\0';
    if (do_set) {
       sethostname(hostname,strlen(hostname));
    } else {
       printf("%s\n", hostname);
    }
+   free(unipi_platform);
    free(unipi_serial);
    free(unipi_model);
    return 0;
