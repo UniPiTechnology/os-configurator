@@ -32,7 +32,7 @@ LIBS = m
 
 BINFILES = unipiid unipihostname uhelper sw_485
 PYFILES = os-configurator.py
-SHFILES = os-configurator
+SHFILES = os-configurator reconfigure-net
 
 # Define optimisation level here
 #OPT = -Ofast # Very aggressive
