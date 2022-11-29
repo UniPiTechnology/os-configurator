@@ -15,6 +15,13 @@ class UnipiId:
 		pass
 
 	@classmethod
+	def get_api_version(cls):
+		try:
+			return int(cls.get_line_item("api_version"), 10)
+		except:
+			return 0
+
+	@classmethod
 	def get_line_item(cls, item):
 		with open(cls.path+item, "r") as f:
 			return f.readline().strip()
@@ -28,9 +35,12 @@ class UnipiId:
 	def get_hex_item(cls, item):
 		return int(cls.get_line_item(item), 16)
 
+
 	@classmethod
 	def _slots(cls):
-		result = ((int(m.split('.')[1],10),m) for m in os.listdir(cls.path) if m.startswith('module_id.'))
+		api = cls.get_api_version()
+		item = 'card_id' if api > 0 else 'module_id'
+		result = ((int(m.split('.')[1],10),m) for m in os.listdir(cls.path) if m.startswith(item))
 		return sorted(result)
 
 	@classmethod
@@ -76,8 +86,10 @@ def get_product_info():
 	return product_info
 
 
-def get_baseboard_info():
-	board_id = UnipiId.get_hex_item("baseboard_id")
+def get_motherboard_info():
+	api = UnipiId.get_api_version()
+	item = 'baseboard_id' if api > 0 else 'baseboard_id'
+	board_id = UnipiId.get_hex_item(item)
 	board_info = lib.unipi_board_info(board_id)
 	if not board_info and (is_valid_id(board_id)):
 		warning("Unknown board %04x" % (board_id,))
@@ -98,16 +110,16 @@ def main_overlays():
 	if product_info:
 		merge_dict(result, product_info.vars)
 
-	board_info = get_baseboard_info()
+	board_info = get_motherboard_info()
 	if board_info:
 		merge_dict(result, board_info.vars)
 
-	for slot, module_id in UnipiId.slot_ids():
-		module_info = lib.unipi_board_info(module_id, slot)
-		if not module_info and (is_valid_id(module_id)):
-			warning("Unknown board %04x in slot %d" % (module_id, slot))
-		if module_info:
-			merge_dict(result, module_info.vars)
+	for slot, card_id in UnipiId.slot_ids():
+		card_info = lib.unipi_board_info(card_id, slot)
+		if not card_info and (is_valid_id(card_id)):
+			warning("Unknown card %04x in slot %d" % (card_id, slot))
+		if card_info:
+			merge_dict(result, card_info.vars)
 
 	return result
 

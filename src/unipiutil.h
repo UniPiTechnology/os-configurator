@@ -18,8 +18,8 @@
 # define PROJECT_VER stringify(PROJECT_VERSION)
 
 char* get_unipi_id_item(const char* item, int trunc);
-int for_each_module_id(int (*callback)(int, int, void*), void* cbdata);
-int for_each_module_description(int (*callback)(int, const char*, void*), void* cbdata);
+int for_each_card_id(int (*callback)(int, int, void*), void* cbdata);
+int for_each_card_description(int (*callback)(int, const char*, void*), void* cbdata);
 
 int wait_for_module(int timeout);
 

@@ -59,12 +59,13 @@ err:
    return NULL;
 }
 
-int for_each_module_id(int (*callback)(int, int, void*), void* cbdata)
+int for_each_card_id(int (*callback)(int, int, void*), void* cbdata)
 {
-    int slot, module_id;
+    int slot, card_id;
     DIR *d;
     struct dirent *dir;
-    char prefix[] = "module_id.";
+    char oprefix[] = "module_id.";
+    char prefix[] = "card_id.";
     char* value;
 
     d = opendir(UNIPI_ID_SYSFS);
@@ -73,9 +74,9 @@ int for_each_module_id(int (*callback)(int, int, void*), void* cbdata)
             if ((dir->d_type == DT_REG)&&( strstr(dir->d_name, prefix) == dir->d_name)) {
                 if (sscanf(dir->d_name+strlen(prefix), "%d", &slot) == 1) {
                     value = get_unipi_id_item(dir->d_name, 1);
-                    if (value && (sscanf(value, "%x", &module_id)==1)) {
+                    if (value && (sscanf(value, "%x", &card_id)==1)) {
                         free(value);
-                        if (callback(slot, module_id, cbdata) != 0) break;
+                        if (callback(slot, card_id, cbdata) != 0) break;
                         //printf("%s %d %d\n", dir->d_name, slot, module_id);
                     } else if (value) free(value);
                 }
@@ -86,12 +87,19 @@ int for_each_module_id(int (*callback)(int, int, void*), void* cbdata)
     return(0);
 }
 
-int for_each_module_description(int (*callback)(int, const char *, void*), void* cbdata)
+int for_each_card_description(int (*callback)(int, const char *, void*), void* cbdata)
 {
     int slot;
     DIR *d;
     struct dirent *dir;
-    char prefix[] = "module_description.";
+    char prefix_v0[] = "module_description.";
+    char prefix_v1[] = "card_description.";
+    char *prefix;
+    int  api=0;
+
+    char* apistr = get_unipi_id_item("api_version", 1);
+    if (apistr && (sscanf(apistr, "%d", &api)!=1)) api = 0;
+    prefix = (api>0) ? prefix_v1 : prefix_v0;
 
     d = opendir(UNIPI_ID_SYSFS);
     if (d) {
