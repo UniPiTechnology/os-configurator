@@ -86,9 +86,9 @@ def get_product_info():
 	return product_info
 
 
-def get_motherboard_info():
+def get_mainboard_info():
 	api = UnipiId.get_api_version()
-	item = 'motherboard_id' if api > 0 else 'baseboard_id'
+	item = 'mainboard_id' if api > 0 else 'baseboard_id'
 	board_id = UnipiId.get_hex_item(item)
 	board_info = lib.unipi_board_info(board_id)
 	if not board_info and (is_valid_id(board_id)):
@@ -110,7 +110,7 @@ def main_overlays():
 	if product_info:
 		merge_dict(result, product_info.vars)
 
-	board_info = get_motherboard_info()
+	board_info = get_mainboard_info()
 	if board_info:
 		merge_dict(result, board_info.vars)
 
