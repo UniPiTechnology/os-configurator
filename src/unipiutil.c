@@ -64,9 +64,14 @@ int for_each_card_id(int (*callback)(int, int, void*), void* cbdata)
     int slot, card_id;
     DIR *d;
     struct dirent *dir;
-    char oprefix[] = "module_id.";
-    char prefix[] = "card_id.";
-    char* value;
+    char prefix_v0[] = "module_id.";
+    char prefix_v1[] = "card_id.";
+    char *value, *prefix;
+    int api = 0;
+
+    char* apistr = get_unipi_id_item("api_version", 1);
+    if (apistr && (sscanf(apistr, "%d", &api)!=1)) api = 0;
+    prefix = (api>0) ? prefix_v1 : prefix_v0;
 
     d = opendir(UNIPI_ID_SYSFS);
     if (d) {
