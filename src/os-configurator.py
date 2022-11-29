@@ -88,7 +88,7 @@ def get_product_info():
 
 def get_motherboard_info():
 	api = UnipiId.get_api_version()
-	item = 'baseboard_id' if api > 0 else 'baseboard_id'
+	item = 'motherboard_id' if api > 0 else 'baseboard_id'
 	board_id = UnipiId.get_hex_item(item)
 	board_info = lib.unipi_board_info(board_id)
 	if not board_info and (is_valid_id(board_id)):
