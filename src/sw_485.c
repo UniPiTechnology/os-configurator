@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 1999-2000 Vojtech Pavlik
  *  Copyright (c) 2009-2011 Red Hat, Inc
- *  Copyright (c) 2022 Miroslva Ondra, Faster CZ
+ *  Copyright (c) 2022 Miroslav Ondra, Faster CZ
  */
 
 /**

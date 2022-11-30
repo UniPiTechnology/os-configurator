@@ -153,7 +153,7 @@ int main(int argc, char** argv)
 			}
 			name = unipi_board_name(board_id);
 			if (name)
-				printf("Baseboard: %s\n", name);
+				printf("Motherboard: %s\n", name);
 		}
 		free(unipi_item);
 	}
