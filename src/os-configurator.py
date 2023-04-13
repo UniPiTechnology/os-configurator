@@ -76,6 +76,7 @@ def get_product_info():
 	# validate product_id in library
 	product_info = lib.unipi_product_info(product_id)
 	if product_info:
+		product_info.vars.update({"unipi_platform": "{:04x}".format(product_id)})
 		return product_info
 
 	# try fallback method via product_name for legacy eeprom
@@ -96,13 +97,25 @@ def get_mainboard_info():
 	return board_info
 
 
-def merge_dict(dest, source):
+def merge_dict(dest, source, filter_str=None):
 	for k,v in source.items():
+		if (filter is not None) and (isinstance(v, list)) and (len(v) > 1):
+			specific = list(filter(lambda x: filter_str in x, v))
+			if len(specific) == 1:
+				v = specific[0]
 		try:
 			dest[k].append(v)
-		except KeyError: 
+		except KeyError:
 			dest[k]= [v]
 
+def print_recursive(data):
+        outstr = ""
+        if isinstance(data, str):
+                outstr += (data + " ")
+        elif isinstance(data, list):
+                for item in data:
+                        outstr += print_recursive(item)
+        return outstr
 
 def main_overlays():
 	result = {}
@@ -119,7 +132,7 @@ def main_overlays():
 		if not card_info and (is_valid_id(card_id)):
 			warning("Unknown card %04x in slot %d" % (card_id, slot))
 		if card_info:
-			merge_dict(result, card_info.vars)
+			merge_dict(result, card_info.vars,  product_info.vars.get("unipi_platform"))
 
 	return result
 
@@ -135,14 +148,14 @@ if __name__ == "__main__":
 	try:
 		env = main_overlays()
 		if args.update:
-			os.environ.update(**{k.upper(): " ".join(v) for k,v in env.items()})
+			os.environ.update(**{k.upper(): print_recursive(v).strip() for k,v in env.items()})
 			os.execlpe("run-parts", "run-parts", "--verbose",
 				"--regex=.sh$", "--exit-on-error",
 				"/opt/unipi/os-configurator/run.d",
 				os.environ)
 		else:
 			for k,v in env.items():
-				print("%s='%s'" % (k.upper(), " ".join(v)))
+				print("{}='{}'".format(k.upper(), print_recursive(v).strip()))
 
 		if not args.force:
 			sys.exit(0)
@@ -153,7 +166,7 @@ if __name__ == "__main__":
 		print("Bad ID value in unipi-id eprom.\n", str(E))
 
 	if args.force:
-		if env: os.environ.update(**{k.upper(): " ".join(v) for k,v in env.items()})
+		if env: os.environ.update(**{k.upper(): print_recursive(v).strip() for k,v in env.items()})
 		os.execlpe("run-parts", "run-parts", "--verbose",
 			"--regex=.sh$",
 			"/opt/unipi/os-configurator/run.d",
