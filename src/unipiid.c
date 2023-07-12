@@ -35,7 +35,7 @@ int do_hostname(int argc, char** argv)
    }
 
    unipi_model = get_unipi_id_item("product_model", 1);
-   if (unipi_model==NULL) 
+   if (unipi_model==NULL)
       return 0;
 
    unipi_serial = get_unipi_id_item("product_serial", 1);
@@ -45,6 +45,7 @@ int do_hostname(int argc, char** argv)
    }
 
    unipi_platform = get_unipi_id_item("platform_id", 1);
+   printf("Platfoorm je %s", unipi_platform);
    if (unipi_platform==NULL) {
       free(unipi_serial);
       free(unipi_model);
@@ -61,7 +62,10 @@ int do_hostname(int argc, char** argv)
            c += (serial / 10000);
        }
        snprintf(hostname, 255, "Z%c-%04d", c, (int)(serial % 10000));
-   } else {
+   } else if(strncmp((char*)(unipi_platform + 2), "01", 2) == 0) {
+       snprintf(hostname, 255, "UNIPI1-sn%s", unipi_serial);
+   }
+     else {
        snprintf(hostname, 255, "%s-sn%s", unipi_model, unipi_serial);
    }
    hostname[255] = '\0';
