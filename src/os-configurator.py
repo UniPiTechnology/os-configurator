@@ -61,6 +61,9 @@ class UnipiId:
 				if not callback(module_id, slot): break
 	'''
 
+class Unipi1Id(UnipiId):
+	path = "/etc/unipi-id/"
+
 
 def warning(message):
 	print("WARNING: %s" % message)
@@ -133,6 +136,14 @@ def main_overlays():
 			warning("Unknown card %04x in slot %d" % (card_id, slot))
 		if card_info:
 			merge_dict(result, card_info.vars,  product_info.vars.get("unipi_platform"))
+
+	if product_info.vars.get('use_etc_modules', '0') == '1':
+		for slot, card_id in Unipi1Id.slot_ids():
+			card_info = lib.unipi_board_info(card_id, slot)
+			if not card_info and (is_valid_id(card_id)):
+				warning("Unknown module %04x in position %d" % (card_id, slot))
+			if card_info:
+				merge_dict(result, card_info.vars,  product_info.vars.get("unipi_platform"))
 
 	return result
 
