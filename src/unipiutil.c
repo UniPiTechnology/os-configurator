@@ -46,7 +46,7 @@ char* get_unipi_id_item(const char* item, int trunc)
    if (res <= 0) goto err1;
    data[res] = '\0';
    if (trunc) {
-      lf = strchr(data,'\n');
+      lf = strrchr(data,'\n');
       if (lf) *lf = '\0';
    }
    close(f);

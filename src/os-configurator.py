@@ -79,7 +79,13 @@ def get_product_info():
 	# validate product_id in library
 	product_info = lib.unipi_product_info(product_id)
 	if product_info:
-		product_info.vars.update({"unipi_platform": "{:04x}".format(product_id)})
+		product_name = UnipiId.get_line_item("product_model")
+		product_info.vars.update({
+			"unipi_platform": "{:04x}".format(product_id),
+			"unipi_product_id": "{:04x}".format(product_id),
+			"unipi_product_name": "{}".format(product_name if product_name else product_info.name),
+			"unipi_product_serial": "{}".format(UnipiId.get_line_item('product_serial')),
+		})
 		return product_info
 
 	# try fallback method via product_name for legacy eeprom
@@ -87,6 +93,13 @@ def get_product_info():
 	product_info = lib.unipi_product_info_by_name(product_name)
 	if not product_info:
 		warning("Unknown product %s %04x" % (product_name, product_id))
+	else:
+		product_info.vars.update({
+			"unipi_platform": "{:04x}".format(product_info.id),
+			"unipi_product_id": "{:04x}".format(product_info.id),
+			"unipi_product_name": "{}".format(product_name),
+			"unipi_product_serial": "{}".format(UnipiId.get_line_item('product_serial')),
+		})
 	return product_info
 
 

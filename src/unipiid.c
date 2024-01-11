@@ -45,7 +45,7 @@ int do_hostname(int argc, char** argv)
    }
 
    unipi_platform = get_unipi_id_item("platform_id", 1);
-   printf("Platfoorm je %s", unipi_platform);
+   //printf("Platfoorm je %s", unipi_platform);
    if (unipi_platform==NULL) {
       free(unipi_serial);
       free(unipi_model);
@@ -85,6 +85,7 @@ int do_hostname(int argc, char** argv)
 int main(int argc, char** argv)
 {
 	char * unipi_item;
+	int do_strip = 0;
 
 	wait_for_module(TIMEOUT);
 	if (strcmp(basename(argv[0]), "unipihostname") == 0) {
@@ -94,9 +95,10 @@ int main(int argc, char** argv)
 		if (strcmp(argv[1], "unipihostname") == 0 || strcmp(argv[1], "hostname") == 0)
 			return do_hostname(argc-1, &argv[1]);
 
-		unipi_item = get_unipi_id_item(argv[1], 0);
+		if (strstr(argv[1], "description") != NULL) do_strip = 0;
+		unipi_item = get_unipi_id_item(argv[1], do_strip);
 		if (unipi_item) {
-			printf("%s\n", unipi_item);
+			printf("%s", unipi_item);
 			free(unipi_item);
 		}
 	}
