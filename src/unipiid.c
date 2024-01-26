@@ -52,21 +52,7 @@ int do_hostname(int argc, char** argv)
       return 0;
    }
 
-   if (strncmp(unipi_platform, "0210", 4) == 0) {
-       /* special format for AC Heating version 2*/
-       long serial = strtol(unipi_serial, NULL, 10);
-       char c = 'B';
-       if ((serial / 10000) > ('Z' - 'B')) {
-           serial = 9999; c = 'Z';
-       } else {
-           c += (serial / 10000);
-       }
-       snprintf(hostname, 255, "Z%c-%04d", c, (int)(serial % 10000));
-   } else if (strncmp(unipi_platform, "0110", 4) == 0) {
-       /* special format for AC Heating version 1  */
-       long serial = strtol(unipi_serial, NULL, 10);
-       snprintf(hostname, 255, "ZA-%04d", (int)(serial));
-   } else if(strncmp((char*)(unipi_platform + 2), "01", 2) == 0) {
+   if(strncmp((char*)(unipi_platform + 2), "01", 2) == 0) {
        snprintf(hostname, 255, "UNIPI1-sn%s", unipi_serial);
    }
      else {
