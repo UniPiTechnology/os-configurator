@@ -143,6 +143,8 @@ def main_overlays():
 	if board_info:
 		merge_dict(result, board_info.vars)
 
+	cards = [(slot,card_id)for slot, card_id in UnipiId.slot_ids()]
+
 	for slot, card_id in UnipiId.slot_ids():
 		card_info = lib.unipi_board_info(card_id, slot)
 		if not card_info and (is_valid_id(card_id)):
@@ -151,12 +153,20 @@ def main_overlays():
 			merge_dict(result, card_info.vars,  product_info.vars.get("unipi_platform"))
 
 	if product_info.vars.get('use_etc_modules', '0') == '1':
+		cards += [(slot,card_id)for slot, card_id in Unipi1Id.slot_ids()]
+		#cards1 = " ".join((f"{card_id}__{slot}" for slot, card_id in Unipi1Id.slot_ids()))
+		#if cards1 and cards:
+		#	cards = " ".join((cards, cards1))
+		#elif cards1:
+	#		cards = cards1
+
 		for slot, card_id in Unipi1Id.slot_ids():
 			card_info = lib.unipi_board_info(card_id, slot)
 			if not card_info and (is_valid_id(card_id)):
 				warning("Unknown module %04x in position %d" % (card_id, slot))
 			if card_info:
 				merge_dict(result, card_info.vars,  product_info.vars.get("unipi_platform"))
+	result['cards'] = " ".join((f"{card_id:04x}__{slot}" for slot, card_id in cards))
 
 	return result
 
