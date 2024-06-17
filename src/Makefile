@@ -77,15 +77,6 @@ uhelper:  uhelper.o
 unipihostname: unipiid
 	@ln -s $< $@
 
-
-#unipicheck:  unipicheck.o unipiutil.o
-#	$(CC) unipicheck.o unipiutil.o -o $@
-#	@chmod +x $@
-
-#os-configurator: os-configurator.o unipiutil.o
-#	$(CC) $^ -ldl -o $@
-#	@chmod +x $@
-
 install:
 	$(INSTALL) -D $(BINFILES) $(SHFILES) -t $(DESTDIR)/opt/unipi/tools
 	$(INSTALL) -D $(PYFILES) -t $(DESTDIR)/opt/unipi/os-configurator

@@ -114,15 +114,23 @@ def get_mainboard_info():
 
 
 def merge_dict(dest, source, filter_str=None):
-	for k,v in source.items():
-		if (filter is not None) and (isinstance(v, list)) and (len(v) > 1):
-			specific = list(filter(lambda x: filter_str in x, v))
-			if len(specific) == 1:
-				v = specific[0]
-		try:
-			dest[k].append(v)
-		except KeyError:
-			dest[k]= [v]
+
+        for k,v in source.items():
+                # If at least one specific item exists
+                if (filter_str is not None) and (isinstance(v, list)) and (len(v) > 1):
+                        specific = list(filter(lambda x: filter_str in x, v))
+                        # First specific item that matches is used
+                        if len(specific) >= 1:
+                                v = specific[0]
+                        # If not specific item matches, use the first generic
+                        else:
+                                generic = list(filter(lambda x: x.count('_') == 1, v))
+                                v = generic[0]
+                try:
+                        dest[k].append(v)
+                except KeyError:
+                        dest[k]= [v]
+
 
 def print_recursive(data):
         outstr = ""
@@ -132,6 +140,7 @@ def print_recursive(data):
                 for item in data:
                         outstr += print_recursive(item)
         return outstr
+
 
 def main_overlays():
 	result = {}
