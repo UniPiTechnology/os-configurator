@@ -27,7 +27,8 @@ if [ "$1" = "--update" ]; then
         mount / -o remount,ro
         #sleep 2;
         sync
-        systemctl reboot #start systemd-reboot
+        systemctl start reboot.target --job-mode=replace-irreversibly --no-block
+        #systemctl reboot
     fi
     exit $?
 fi
