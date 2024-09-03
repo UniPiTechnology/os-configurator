@@ -11,15 +11,6 @@ case "$1" in
       ( /opt/unipi/tools/os-configurator --force && dpkg-trigger os-configurator-done ) || echo "os-configurator return error, please call it manually."
     fi
   ;;
-
-  configure|abort-upgrade|abort-remove|abort-deconfigure)
-    exit 0
-  ;;
-
-  *)
-    echo "postinst called with unknown argument \`$1'" >&2
-    exit 1
-  ;;
 esac
 
 # dh_installdeb will replace this with shell code automatically
