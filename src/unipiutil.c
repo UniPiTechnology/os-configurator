@@ -8,6 +8,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include "uniee.h"
+#include "unipi_eprom.h"
 
 
 char UNIPI_ID_SYSFS[] = "/sys/devices/platform/unipi-id/unipi-id";
@@ -119,6 +121,63 @@ int for_each_card_description(int (*callback)(int, const char *, void*), void* c
         closedir(d);
     }
     return(0);
+}
+
+
+#define UNIPI_EEPROM_SIZE UNIEE_MIN_EE_SIZE
+static uint8_t unipi_eprom[UNIPI_EEPROM_SIZE] __attribute__ ((aligned(32)));
+static int unipi_eprom_validity = -1;
+uniee_descriptor_area* uniee_descriptor;
+
+int get_unipi_eeprom(char* nvram, int(*callback)(int, int, uint8_t*))
+{
+	int ret;
+	int fd = open(nvram, O_RDONLY);
+	if (fd < 0)
+		return fd;
+
+	//ret = i2c_eeprom_read(dev, 0x0, unipi_eprom, UNIPI_EEPROM_SIZE);
+	ret = read(fd, unipi_eprom, UNIPI_EEPROM_SIZE);
+	close(fd);
+	if (ret < 0) {
+		return ret;
+	}
+
+    /* check unipi mark */
+	uniee_descriptor = uniee_get_valid_descriptor(unipi_eprom, UNIPI_EEPROM_SIZE);
+	if (uniee_descriptor == NULL) {
+		unipi_eprom_validity = 1;
+		return -1;
+	}
+
+	uniee_fix_legacy_content(unipi_eprom, UNIPI_EEPROM_SIZE, uniee_descriptor);
+	unipi_eeprom_enum_properties(unipi_eprom, uniee_descriptor, callback);
+	return 0;
+}
+
+uint8_t* get_unipi_eeprom_property(char* nvram, int property_type, int *len)
+{
+	int ret;
+	int fd = open(nvram, O_RDONLY);
+	if (fd < 0)
+		return fd;
+
+	//ret = i2c_eeprom_read(dev, 0x0, unipi_eprom, UNIPI_EEPROM_SIZE);
+	ret = read(fd, unipi_eprom, UNIPI_EEPROM_SIZE);
+	close(fd);
+	if (ret < 0) {
+		return ret;
+	}
+
+    /* check unipi mark */
+	uniee_descriptor = uniee_get_valid_descriptor(unipi_eprom, UNIPI_EEPROM_SIZE);
+	if (uniee_descriptor == NULL) {
+		unipi_eprom_validity = 1;
+		return -1;
+	}
+
+	uniee_fix_legacy_content(unipi_eprom, UNIPI_EEPROM_SIZE, uniee_descriptor);
+	return unipi_eeprom_find_property(unipi_eprom, uniee_descriptor, property_type, len);
 }
 
 /*

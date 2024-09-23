@@ -23,4 +23,7 @@ int for_each_card_description(int (*callback)(int, const char*, void*), void* cb
 
 int wait_for_module(int timeout);
 
+int get_unipi_eeprom(char* nvram, int(*callback)(int, int, uint8_t*));
+uint8_t* get_unipi_eeprom_property(char* nvram, int property_type, int *len);
+
 #endif

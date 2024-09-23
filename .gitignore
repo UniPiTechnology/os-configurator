@@ -8,6 +8,9 @@
 *.exe
 src/unipihostname
 src/unipicheck
+src/unipiid
+src/sw_485
+src/uhelper
 .travis.yml
 .dir-locals.el
 .deps
