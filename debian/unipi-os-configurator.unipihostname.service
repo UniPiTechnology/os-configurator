@@ -3,6 +3,7 @@ Description=Set default hostname on Unipi controllers
 After=local-fs.target
 BindsTo=sys-devices-platform-unipi\x2did.device
 After=sys-devices-platform-unipi\x2did.device
+ConditionVirtualization=No
 #Before=avahi-daemon.service
 
 [Service]
