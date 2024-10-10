@@ -5,6 +5,9 @@
 
 
 case "$1" in
+  configure)
+    dpkg-trigger os-configurator-force
+    ;;
   triggered)
     if [ -x /opt/unipi/tools/os-configurator ]; then
       echo "Calling os-configurator update..." >&2
