@@ -5,11 +5,11 @@ OLD_FINGERPRINT=/opt/unipi/os-configurator/fingerprint
 if [ "$1" = "--check" ]; then
     echo "<6>OS Configurator: check started" > /dev/kmsg
     FG="$(/opt/unipi/tools/unipiid fingerprint)"
-    OFG="$(cat ${OLD_FINGERPRINT})"
-    #logger FG=$FG OFG=$OFG
-    
-    if [ "$(/opt/unipi/tools/unipiid fingerprint)" = "$(cat ${OLD_FINGERPRINT})" ]; then
+    if [ -n "$FG" ]; then
+        rm /run/motd.d/99-unipi-id
+    fi
 
+    if [ "$FG" = "$(cat ${OLD_FINGERPRINT})" ]; then
         echo "<6>OS Configurator: Check complete, no changes" > /dev/kmsg
         exit 0
     fi
