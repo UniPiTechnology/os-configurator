@@ -30,9 +30,9 @@ endif
 # List all user libraries here
 LIBS = m
 
-BINFILES = unipiid unipihostname uhelper sw_485
+BINFILES = unipiid unipihostname uhelper sw_485 bootcount
 PYFILES = os-configurator.py
-SHFILES = os-configurator reconfigure-net
+SHFILES = os-configurator reconfigure-net switchboot
 
 # Define optimisation level here
 #OPT = -Ofast # Very aggressive
@@ -76,6 +76,10 @@ uhelper:  uhelper.o
 
 unipihostname: unipiid
 	@ln -s $< $@
+
+bootcount:  bootcount.o
+	$(CC) $< -o $@
+	@chmod +x $@
 
 install:
 	$(INSTALL) -D $(BINFILES) $(SHFILES) -t $(DESTDIR)/opt/unipi/tools

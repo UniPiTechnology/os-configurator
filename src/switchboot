@@ -1,0 +1,111 @@
+#!/bin/bash
+
+create_alternate_script()
+{
+    altpart="$1"
+    bootdev="$2"
+    mmc=$(basename "$bootdev")
+    mmc=${mmc/blk/}
+    echo "$mmc:$1" > /boot/tryboot
+
+    tmp=$(mktemp)
+    echo "distro_bootpart=$altpart" > "$tmp"
+    mkimage -C none -A arm -T script -d "$tmp" /boot/recover.scr >/dev/null
+    rm -f "$tmp"
+}
+
+set_boot_permanent()
+{
+    dev=$1
+    old=$2
+    new=$3
+    [ "$old" = "$new" ] && return
+    tmppart=$(mktemp) || return 1
+    sfdisk -d "$dev" > "$tmppart"
+    if grep -q 'label: gpt' "$tmppart"; then
+        sfdisk --no-reread --no-tell-kernel --quiet --part-attrs "$dev" "$new" LegacyBIOSBootable
+        sfdisk --no-reread --no-tell-kernel --quiet --part-attrs "$dev" "$old" ""
+        #sed "s|,[[:blank:]]*attrs=.*$||;\#$dev$new#s|$|, attrs=\"LegacyBIOSBootable\"|"
+    else
+        #echo "Dos type partition"
+        sfdisk --no-reread --no-tell-kernel --quiet --activate "$dev" "$new"
+    fi
+    rm -f "$tmppart"
+}
+
+swap_part_number()
+{
+    if ! [ -r /etc/default/switchboot ]; then
+        echo "Cannot read configuration of A/B system from /etc/default/switchboot" >&2
+        exit 1
+    fi
+    unset A
+    unset B
+    . /etc/default/switchboot
+    if [ -z "$A" ] || [ -z "$B" ]; then
+        echo "Incorrect definition of variables A and B in /etc/default/switchboot" >&2
+        echo "Define in the file for example A=2 and B=3" >&2
+        exit 1
+    fi
+    if [ "$1" = "$B" ]; then
+        echo "$A"
+    elif [ "$1" = "$A" ]; then
+        echo "$B"
+    else
+        echo "Bootpart unknown ($1)! Alternate boot not set!" >&2
+        exit 1
+    fi
+}
+
+#bootdev=$(df --output=source /boot | grep '^/')
+bootdev=$(awk '($2=="/") { print $1;}' /proc/mounts)   #'
+if [ "$bootdev" = "/dev/root" ]; then
+    bootdev=$(readlink -f /dev/block/`stat -L -c %Hd:%Ld /boot`)
+fi
+bootpart=${bootdev: -1}
+bootdev=${bootdev:0: -2}
+
+pbootdev=$(sfdisk -o Device,Attrs -l "$bootdev" | awk '/LegacyBIOSBootable/ || $2==80  {print $1;}')
+pbootpart=${pbootdev: -1}
+case "$1" in
+  --p*)
+        set_boot_permanent "$bootdev" "$pbootpart" "$bootpart"
+        [ -e /boot/recover.scr ] && rm -f /boot/recover.scr
+        [ -e /boot/tryboot ] && rm -f /boot/tryboot
+        ;;
+  --t*)
+        if [ "$bootpart" != "$pbootpart" ]; then
+            echo "Boot state inconsistent! Alternate boot not set!" >&2
+            exit 1
+        fi
+        altpart=$(swap_part_number "$bootpart") || exit 1
+        create_alternate_script "$altpart" "$bootdev"
+        /opt/unipi/tools/bootcount set
+        ;;
+  os-configurator-event)
+        # call from os-configurator during boot to try reboot again
+        if [ "$bootpart" != "$pbootpart" ]; then
+            /opt/unipi/tools/bootcount set
+        fi
+        ;;
+
+  mender_boot_part)
+        echo "mender_boot_part=$bootpart"
+        ;;
+  upgrade_available)
+        if [ "$bootpart" = "$pbootpart" ] && [ ! -e /boot/recover.scr ] ; then
+            echo "upgrade_available=0"
+        else
+            echo "upgrade_available=1"
+        fi
+        ;;
+  mender_check_saveenv_canary)
+        ;;
+  "")
+        echo -ne "Boot device:      $bootdev\nLoaded boot part:    $bootpart\nPermanent boot part: $pbootpart\n"
+        ;;
+  *)
+    echo 'Usage:'
+    echo "  $0 [--try] [--permanent] [--help]"
+    exit 1
+esac
