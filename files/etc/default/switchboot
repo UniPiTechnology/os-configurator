@@ -1,0 +1,6 @@
+
+# Define partiton numbers for A/B boot system
+# There is no defaults! Must be overriden
+
+#A=2
+#B=3
